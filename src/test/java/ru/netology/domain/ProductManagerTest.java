@@ -15,8 +15,18 @@ public class ProductManagerTest {
     ProductRepository repo = new ProductRepository();
     ProductManager manager = new ProductManager(repo);
 
+
     @Test
-    public void shouldAddFilms() {
+    public void shouldFindStringInProduct() {
+
+        boolean actual = manager.matches(smartphone1, "Pro");
+        boolean expected = true;
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldFind2Items() {
 
         manager.add(book1);
         manager.add(book2);
@@ -25,10 +35,25 @@ public class ProductManagerTest {
         manager.add(smartphone2);
         manager.add(smartphone3);
 
-        Product[] actual = manager.findAll();
-        Product[] expected = {book1, book2, book3, smartphone1, smartphone2, smartphone3};
+        manager.findAll();
+
+        Product[] actual = manager.searchBy("Pro");
+        Product[] expected = {smartphone1, smartphone3};
 
         Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldFindById() {
+
+        manager.add(book1);
+        manager.add(book2);
+        manager.add(book3);
+        manager.add(smartphone1);
+        manager.add(smartphone2);
+        manager.add(smartphone3);
+
+        Assertions.assertEquals(book3, repo.findById(210));
     }
 
     @Test
@@ -50,7 +75,7 @@ public class ProductManagerTest {
     }
 
     @Test
-    public void shouldFind2Elements() {
+    public void shouldGenerateNotFoundException() {
 
         manager.add(book1);
         manager.add(book2);
@@ -59,7 +84,42 @@ public class ProductManagerTest {
         manager.add(smartphone2);
         manager.add(smartphone3);
 
-        Product[] actual = manager.searchBy("Pro");
-        Product[] expected = {smartphone1, smartphone3};
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            manager.removeById(58);
+        });
     }
+
+    @Test
+    public void shouldAddFilms() {
+
+        manager.add(book1);
+        manager.add(book2);
+        manager.add(book3);
+        manager.add(smartphone1);
+        manager.add(smartphone2);
+        manager.add(smartphone3);
+
+        Product[] actual = manager.findAll();
+        Product[] expected = {book1, book2, book3, smartphone1, smartphone2, smartphone3};
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldGenerateAlreadyExistException() {
+
+        manager.add(book1);
+        manager.add(book2);
+        manager.add(book3);
+        manager.add(smartphone1);
+        manager.add(smartphone2);
+        manager.add(smartphone3);
+
+        manager.findAll();
+
+        Assertions.assertThrows(AlreadyExistsException.class, () -> {
+            manager.add(smartphone1);
+        });
+    }
+
 }
